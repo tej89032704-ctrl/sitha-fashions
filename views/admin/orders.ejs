@@ -1,0 +1,85 @@
+<%- include('header') %>
+<div class="admin-container">
+  <%- include('sidebar') %>
+  <main class="admin-main">
+    <h1>Orders</h1>
+    <div class="filter-tabs">
+      <a href="/admin/orders" class="btn btn-sm <%= (!selectedStatus && !selectedPayment) ? 'btn-primary' : 'btn-outline' %>">All</a>
+      <a href="/admin/orders?status=pending" class="btn btn-sm <%= selectedStatus === 'pending' ? 'btn-primary' : 'btn-outline' %>">Pending</a>
+      <a href="/admin/orders?status=confirmed" class="btn btn-sm <%= selectedStatus === 'confirmed' ? 'btn-primary' : 'btn-outline' %>">Confirmed</a>
+      <a href="/admin/orders?status=shipped" class="btn btn-sm <%= selectedStatus === 'shipped' ? 'btn-primary' : 'btn-outline' %>">Shipped</a>
+      <a href="/admin/orders?status=delivered" class="btn btn-sm <%= selectedStatus === 'delivered' ? 'btn-primary' : 'btn-outline' %>">Delivered</a>
+      <a href="/admin/orders?status=cancelled" class="btn btn-sm <%= selectedStatus === 'cancelled' ? 'btn-primary' : 'btn-outline' %>">Cancelled</a>
+      <span style="width:1px;height:24px;background:var(--border-color);margin:0 4px;"></span>
+      <a href="/admin/orders?payment=paid" class="btn btn-sm <%= selectedPayment === 'paid' ? 'btn-success' : 'btn-outline' %>">Paid</a>
+      <a href="/admin/orders?payment=unpaid" class="btn btn-sm <%= selectedPayment === 'unpaid' ? 'btn-danger' : 'btn-outline' %>">Unpaid</a>
+    </div>
+    <% if (orders.length === 0) { %>
+      <div class="empty-state">
+        <i class="fas fa-shopping-bag"></i>
+        <h3>No orders found</h3>
+      </div>
+    <% } else { %>
+      <% orders.forEach(order => { %>
+        <div class="admin-order-card">
+          <div class="order-header">
+            <div>
+              <strong>Order #<%= order.id %></strong>
+              <span class="order-status status-<%= order.status %>" style="margin-left:10px;"><%= order.status %></span>
+              <span style="margin-left:10px;color:<%= order.payment_status === 'paid' ? 'var(--neon-green)' : 'var(--neon-orange)' %>;font-size:0.8rem;"><%= order.payment_status %></span>
+              <div style="margin-top:4px;font-size:0.8rem;color:var(--text-dim);">
+                <%= order.customer_name %> &middot; <%= order.customer_email %>
+                <span class="order-date"><%= new Date(order.created_at).toLocaleString() %></span>
+              </div>
+            </div>
+            <form action="/admin/orders/status" method="POST" class="status-form" style="display:flex;gap:8px;align-items:center;">
+              <input type="hidden" name="order_id" value="<%= order.id %>">
+              <select name="status" onchange="this.form.submit()" style="width:auto;">
+                <option value="pending" <%= order.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                <option value="confirmed" <%= order.status === 'confirmed' ? 'selected' : '' %>>Confirmed</option>
+                <option value="shipped" <%= order.status === 'shipped' ? 'selected' : '' %>>Shipped</option>
+                <option value="delivered" <%= order.status === 'delivered' ? 'selected' : '' %>>Delivered</option>
+                <option value="cancelled" <%= order.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+              </select>
+              <select name="payment_status" onchange="this.form.submit()" style="width:auto;">
+                <option value="unpaid" <%= order.payment_status === 'unpaid' ? 'selected' : '' %>>Unpaid</option>
+                <option value="paid" <%= order.payment_status === 'paid' ? 'selected' : '' %>>Paid</option>
+                <option value="refunded" <%= order.payment_status === 'refunded' ? 'selected' : '' %>>Refunded</option>
+              </select>
+            </form>
+          </div>
+          <div class="order-items">
+            <% (orderItems[order.id] || []).forEach(item => { %>
+              <div class="order-item">
+                <% if (item.image) { %>
+                  <img src="<%= item.image %>" alt="<%= item.name %>">
+                <% } else { %>
+                  <div class="no-image tiny"><i class="fas fa-image"></i></div>
+                <% } %>
+                <div class="order-item-info">
+                  <p><%= item.name %></p>
+                  <small>Qty: <%= item.quantity %> | Size: <%= item.size || '-' %> | ₹<%= Number(item.price).toLocaleString() %></small>
+                </div>
+                <span>₹<%= (item.price * item.quantity).toLocaleString() %></span>
+              </div>
+            <% }) %>
+          </div>
+          <div class="order-footer">
+            <span>
+              Total: <strong>₹<%= Number(order.total_amount).toLocaleString() %></strong>
+              <% if (order.discount_amount > 0) { %>
+                <span style="color:var(--neon-green);margin-left:10px;">(Disc: ₹<%= Number(order.discount_amount).toLocaleString() %>)</span>
+              <% } %>
+              <% if (order.coupon_code) { %>
+                <span style="color:var(--neon-yellow);margin-left:5px;">Coupon: <%= order.coupon_code %></span>
+              <% } %>
+            </span>
+            <span>📍 <%= order.address %> | 📞 <%= order.phone %></span>
+          </div>
+        </div>
+      <% }) %>
+      <%- include('../partials/pagination', { page, totalPages, querystring: 'page=' }) %>
+    <% } %>
+  </main>
+</div>
+<%- include('footer') %>

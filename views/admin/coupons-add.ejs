@@ -1,0 +1,50 @@
+<%- include('header') %>
+<div class="admin-container">
+  <%- include('sidebar') %>
+  <main class="admin-main">
+    <h1>Create Coupon</h1>
+    <div class="form-card">
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <%= error %></div>
+      <% } %>
+      <form method="POST" action="/admin/coupons/add">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Coupon Code</label>
+            <input type="text" name="code" value="<%= coupon.code || '' %>" required placeholder="SAVE20" style="text-transform:uppercase;letter-spacing:3px;">
+          </div>
+          <div class="form-group">
+            <label>Discount Type</label>
+            <select name="discount_type">
+              <option value="percentage" <%= coupon.discount_type === 'percentage' ? 'selected' : '' %>>Percentage (%)</option>
+              <option value="fixed" <%= coupon.discount_type === 'fixed' ? 'selected' : '' %>>Fixed (₹)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Discount Value</label>
+            <input type="number" name="discount_value" value="<%= coupon.discount_value || '' %>" required step="0.01" placeholder="10">
+          </div>
+          <div class="form-group">
+            <label>Min Order Amount (₹)</label>
+            <input type="number" name="min_order_amount" value="<%= coupon.min_order_amount || '' %>" step="0.01" placeholder="0">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Max Uses (0 = unlimited)</label>
+            <input type="number" name="max_uses" value="<%= coupon.max_uses || '' %>" min="0" placeholder="0">
+          </div>
+          <div class="form-group">
+            <label>Expiry Date</label>
+            <input type="date" name="expires_at" value="<%= coupon.expires_at || '' %>">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-tag"></i> Create Coupon</button>
+        <a href="/admin/coupons" class="btn btn-outline">Cancel</a>
+      </form>
+    </div>
+  </main>
+</div>
+<%- include('footer') %>

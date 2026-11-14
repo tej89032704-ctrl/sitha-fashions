@@ -1,0 +1,78 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2>Complete Payment</h2>
+    </div>
+    <div class="checkout-layout">
+      <div class="checkout-form">
+        <h3>Order #<%= order.id %></h3>
+        <div class="summary-items">
+          <% items.forEach(item => { %>
+            <div class="summary-item">
+              <span><%= item.name %> x <%= item.quantity %></span>
+              <span>₹<%= (item.price * item.quantity).toLocaleString() %></span>
+            </div>
+          <% }) %>
+        </div>
+        <% if (order.discount_amount > 0) { %>
+          <div class="summary-item">
+            <span>Discount (<%= order.coupon_code %>)</span>
+            <span>-₹<%= Number(order.discount_amount).toLocaleString() %></span>
+          </div>
+        <% } %>
+        <div class="summary-total">
+          <strong>Total: ₹<%= Number(order.total_amount - order.discount_amount).toLocaleString() %></strong>
+        </div>
+        <button id="pay-btn" class="btn btn-primary btn-full">Pay with Razorpay</button>
+      </div>
+    </div>
+  </div>
+</section>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.getElementById('pay-btn').addEventListener('click', function() {
+  fetch('/payment/create-order', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json', 'X-CSRF-Token': getCookie('csrf_token')},
+    body: JSON.stringify({ order_id: <%= order.id %> })
+  }).then(r => r.json()).then(order => {
+    if (order.error) { alert(order.error); return; }
+    const options = {
+      key: '<%= razorpayKeyId %>',
+      amount: order.amount,
+      currency: order.currency,
+      name: 'Sitha Fashions',
+      order_id: order.id,
+      handler: function(response) {
+        fetch('/payment/verify', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json', 'X-CSRF-Token': getCookie('csrf_token')},
+          body: JSON.stringify({
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            order_id: <%= order.id %>
+          })
+        }).then(r => r.json()).then(result => {
+          if (result.success) {
+            window.location.href = '/payment/success/<%= order.id %>';
+          } else {
+            alert('Payment verification failed');
+          }
+        });
+      },
+      prefill: { name: '<%= user.name %>', contact: '<%= order.phone %>' },
+      theme: { color: '#b8860b' }
+    };
+    const rzp = new Razorpay(options);
+    rzp.open();
+  });
+});
+
+function getCookie(name) {
+  var m = document.cookie.match('(^|; )' + name + '=([^;]+)');
+  return m ? m[2] : '';
+}
+</script>
+<%- include('../partials/footer') %>

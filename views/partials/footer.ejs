@@ -1,0 +1,22 @@
+<footer class="footer">
+  <div class="container">
+    <p>&copy; 2024 Sitha Fashions. All rights reserved.</p>
+  </div>
+</footer>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var token = '<%= csrfToken %>';
+    if (token) {
+      document.querySelectorAll('form[method="POST"]').forEach(function(form) {
+        if (form.querySelector('input[name="csrf_token"]')) return;
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'csrf_token';
+        input.value = token;
+        form.appendChild(input);
+      });
+    }
+  });
+</script>
+</body>
+</html>

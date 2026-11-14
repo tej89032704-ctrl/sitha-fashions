@@ -1,0 +1,89 @@
+<%- include('header') %>
+<div class="admin-container">
+  <%- include('sidebar') %>
+  <main class="admin-main">
+    <a href="/admin/customers" class="btn btn-outline btn-sm" style="margin-bottom:16px;"><i class="fas fa-arrow-left"></i> Back to Customers</a>
+    <div class="admin-grid" style="grid-template-columns:1fr 2fr;">
+      <div class="admin-card">
+        <h2>Customer Profile</h2>
+        <div style="text-align:center;padding:20px 0;">
+          <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--neon-cyan),var(--neon-magenta));margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:2rem;color:#fff;box-shadow:0 0 20px rgba(0,255,247,0.2);">
+            <%= customer.name.charAt(0).toUpperCase() %>
+          </div>
+          <h3 style="font-family:var(--font-heading);color:var(--text-bright);"><%= customer.name %></h3>
+          <p style="color:var(--text-dim);font-size:0.85rem;"><%= customer.email %></p>
+          <p style="color:var(--text-muted);font-size:0.8rem;">Joined: <%= new Date(customer.created_at).toLocaleDateString() %></p>
+        </div>
+        <div style="border-top:1px solid var(--border-color);padding-top:16px;">
+          <p style="font-size:0.85rem;margin-bottom:8px;"><span style="color:var(--text-dim);">Phone:</span> <%= customer.phone || '-' %></p>
+          <p style="font-size:0.85rem;margin-bottom:8px;"><span style="color:var(--text-dim);">Address:</span> <%= customer.address || '-' %></p>
+          <p style="font-size:0.85rem;"><span style="color:var(--text-dim);">Status:</span> <span class="badge badge-success">Active</span></p>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <h2>Stats</h2>
+        <div class="stats-grid" style="margin-bottom:0;grid-template-columns:repeat(3,1fr);gap:16px;">
+          <div class="stat-card" style="padding:20px;border-left-color:var(--neon-cyan);">
+            <i class="fas fa-shopping-bag" style="font-size:1.5rem;color:var(--neon-cyan);"></i>
+            <div><h3><%= orderCount %></h3><p>Orders</p></div>
+          </div>
+          <div class="stat-card" style="padding:20px;border-left-color:var(--neon-green);">
+            <i class="fas fa-rupee-sign" style="font-size:1.5rem;color:var(--neon-green);"></i>
+            <div><h3>₹<%= Number(totalSpent).toLocaleString() %></h3><p>Spent</p></div>
+          </div>
+          <div class="stat-card" style="padding:20px;border-left-color:var(--neon-magenta);">
+            <i class="fas fa-heart" style="font-size:1.5rem;color:var(--neon-magenta);"></i>
+            <div><h3><%= wishlistItems.length %></h3><p>Wishlist</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-card" style="margin-top:28px;">
+      <h2>Order History (<%= orderCount %>)</h2>
+      <table class="admin-table" style="box-shadow:none;border:none;background:transparent;">
+        <thead><tr><th>#</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th><th>Payment</th></tr></thead>
+        <tbody>
+          <% orders.forEach(o => { %>
+            <tr>
+              <td>#<%= o.id %></td>
+              <td class="text-muted"><%= new Date(o.created_at).toLocaleDateString() %></td>
+              <td>
+                <% if (orderItems[o.id]) { %>
+                  <%= orderItems[o.id].map(i => i.name).join(', ') %>
+                <% } %>
+              </td>
+              <td>₹<%= Number(o.total_amount).toLocaleString() %></td>
+              <td><span class="order-status status-<%= o.status %>"><%= o.status %></span></td>
+              <td style="color:<%= o.payment_status === 'paid' ? 'var(--neon-green)' : 'var(--neon-orange)' %>;"><%= o.payment_status %></td>
+            </tr>
+          <% }) %>
+          <% if (orders.length === 0) { %>
+            <tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:40px;">No orders yet</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+    <% if (wishlistItems.length > 0) { %>
+    <div class="admin-card" style="margin-top:28px;">
+      <h2>Wishlist (<%= wishlistItems.length %>)</h2>
+      <div class="dress-grid" style="grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));">
+        <% wishlistItems.forEach(w => { %>
+          <div class="dress-card">
+            <div class="dress-image" style="height:160px;">
+              <% if (w.image) { %><img src="<%= w.image %>" alt="<%= w.name %>"><% } else { %><div class="no-image"><i class="fas fa-image"></i></div><% } %>
+            </div>
+            <div class="dress-info" style="padding:12px;">
+              <h3 style="font-size:0.85rem;"><%= w.name %></h3>
+              <p class="dress-price" style="font-size:0.95rem;">₹<%= Number(w.price).toLocaleString() %></p>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+    <% } %>
+  </main>
+</div>
+<%- include('footer') %>

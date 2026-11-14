@@ -1,0 +1,42 @@
+<%- include('header') %>
+<div class="admin-container">
+  <%- include('sidebar') %>
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1>Coupons</h1>
+      <a href="/admin/coupons/add" class="btn btn-primary"><i class="fas fa-plus"></i> New Coupon</a>
+    </div>
+    <table class="admin-table">
+      <thead>
+        <tr><th>Code</th><th>Type</th><th>Value</th><th>Min Order</th><th>Uses</th><th>Expires</th><th>Status</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        <% coupons.forEach(c => { %>
+          <tr>
+            <td><strong style="color:var(--neon-yellow);font-family:var(--font-heading);letter-spacing:2px;"><%= c.code %></strong></td>
+            <td><%= c.discount_type === 'percentage' ? '%' : '₹' %></td>
+            <td><%= c.discount_type === 'percentage' ? c.discount_value + '%' : '₹' + Number(c.discount_value).toLocaleString() %></td>
+            <td>₹<%= Number(c.min_order_amount).toLocaleString() %></td>
+            <td><%= c.used_count %> / <%= c.max_uses > 0 ? c.max_uses : '∞' %></td>
+            <td class="text-muted"><%= c.expires_at ? new Date(c.expires_at).toLocaleDateString() : 'Never' %></td>
+            <td>
+              <span class="badge <%= c.is_active ? 'badge-success' : 'badge-danger' %>"><%= c.is_active ? 'Active' : 'Inactive' %></span>
+            </td>
+            <td class="action-td">
+              <form method="POST" action="/admin/coupons/toggle/<%= c.id %>" style="display:inline;">
+                <button type="submit" class="btn btn-sm <%= c.is_active ? 'btn-outline' : 'btn-success' %>"><%= c.is_active ? 'Disable' : 'Enable' %></button>
+              </form>
+              <form method="POST" action="/admin/coupons/delete/<%= c.id %>" style="display:inline;" onsubmit="return confirm('Delete this coupon?')">
+                <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+        <% if (coupons.length === 0) { %>
+          <tr><td colspan="8" style="text-align:center;color:var(--text-dim);padding:40px;">No coupons yet. <a href="/admin/coupons/add" style="color:var(--neon-cyan);">Create one</a></td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </main>
+</div>
+<%- include('footer') %>

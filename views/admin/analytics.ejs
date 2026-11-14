@@ -1,0 +1,103 @@
+<%- include('header') %>
+<div class="admin-container">
+  <%- include('sidebar') %>
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1>Analytics</h1>
+      <div class="filter-tabs">
+        <a href="/admin/analytics?period=week" class="btn btn-sm <%= period === 'week' ? 'btn-primary' : 'btn-outline' %>">7 Days</a>
+        <a href="/admin/analytics?period=month" class="btn btn-sm <%= period === 'month' ? 'btn-primary' : 'btn-outline' %>">30 Days</a>
+        <a href="/admin/analytics?period=year" class="btn btn-sm <%= period === 'year' ? 'btn-primary' : 'btn-outline' %>">12 Months</a>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card"><i class="fas fa-rupee-sign" style="color:var(--neon-cyan);"></i><div><h3>₹<%= Number(totalRevenue).toLocaleString() %></h3><p>Total Revenue</p></div></div>
+      <div class="stat-card"><i class="fas fa-shopping-bag" style="color:var(--neon-magenta);"></i><div><h3><%= totalOrders %></h3><p>Total Orders</p></div></div>
+      <div class="stat-card"><i class="fas fa-calculator" style="color:var(--neon-yellow);"></i><div><h3>₹<%= Number(avgOrderValue).toLocaleString() %></h3><p>Avg Order Value</p></div></div>
+      <div class="stat-card"><i class="fas fa-percentage" style="color:var(--neon-green);"></i><div><h3><%= categoryRevenue.length %></h3><p>Categories</p></div></div>
+    </div>
+
+    <div class="admin-grid" style="margin-bottom:28px;">
+      <div class="admin-card">
+        <h2>Sales Trend</h2>
+        <canvas id="salesChart" height="200"></canvas>
+      </div>
+      <div class="admin-card">
+        <h2>Revenue by Category</h2>
+        <canvas id="categoryChart" height="200"></canvas>
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <h2>Category Performance</h2>
+      <table class="admin-table" style="box-shadow:none;border:none;background:transparent;">
+        <thead><tr><th>Category</th><th>Revenue</th><th>Orders</th><th>Share</th></tr></thead>
+        <tbody>
+          <% categoryRevenue.forEach(c => { %>
+            <tr>
+              <td><strong><%= c.category || 'Uncategorized' %></strong></td>
+              <td>₹<%= Number(c.revenue).toLocaleString() %></td>
+              <td><%= c.order_count %></td>
+              <td><%= totalRevenue > 0 ? (c.revenue / totalRevenue * 100).toFixed(1) : 0 %>%</td>
+            </tr>
+          <% }) %>
+          <% if (categoryRevenue.length === 0) { %>
+            <tr><td colspan="4" style="text-align:center;color:var(--text-dim);">No data</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const sCtx = document.getElementById('salesChart').getContext('2d');
+new Chart(sCtx, {
+  type: 'bar',
+  data: {
+    labels: <%= JSON.stringify(salesData.map(d => d.day)) %>,
+    datasets: [{
+      label: 'Revenue',
+      data: <%= JSON.stringify(salesData.map(d => d.revenue)) %>,
+      backgroundColor: 'rgba(0,255,247,0.3)',
+      borderColor: '#00fff7',
+      borderWidth: 1,
+    }, {
+      label: 'Orders',
+      data: <%= JSON.stringify(salesData.map(d => d.orders)) %>,
+      backgroundColor: 'rgba(255,0,255,0.3)',
+      borderColor: '#ff00ff',
+      borderWidth: 1,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { labels: { color: '#d0d0e0' } } },
+    scales: {
+      x: { ticks: { color: '#686880', maxTicksLimit: 10 }, grid: { color: 'rgba(0,255,247,0.05)' } },
+      y: { ticks: { color: '#686880' }, grid: { color: 'rgba(0,255,247,0.05)' } }
+    }
+  }
+});
+const cCtx = document.getElementById('categoryChart').getContext('2d');
+const cLabels = <%= JSON.stringify(categoryRevenue.map(c => c.category || 'Uncategorized')) %>;
+const cData = <%= JSON.stringify(categoryRevenue.map(c => c.revenue)) %>;
+new Chart(cCtx, {
+  type: 'polarArea',
+  data: {
+    labels: cLabels,
+    datasets: [{
+      data: cData,
+      backgroundColor: ['rgba(0,255,247,0.4)','rgba(255,0,255,0.4)','rgba(255,255,0,0.4)','rgba(0,255,65,0.4)','rgba(255,0,64,0.4)','rgba(0,136,255,0.4)'],
+      borderColor: '#0a0a0f',
+      borderWidth: 2,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { labels: { color: '#d0d0e0' } } }
+  }
+});
+</script>
+<%- include('footer') %>

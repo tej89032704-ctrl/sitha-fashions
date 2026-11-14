@@ -1,0 +1,79 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2>Shop All Dresses</h2>
+    </div>
+    <div class="shop-layout">
+      <aside class="filter-sidebar">
+        <h3>Filters</h3>
+        <form action="/shop" method="GET">
+          <div class="form-group">
+            <label>Search</label>
+            <input type="text" name="search" value="<%= search %>" placeholder="Search dresses...">
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <select name="category">
+              <option value="">All Categories</option>
+              <% categories.forEach(cat => { %>
+                <option value="<%= cat %>" <%= selectedCategory === cat ? 'selected' : '' %>><%= cat %></option>
+              <% }) %>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">Apply</button>
+          <a href="/shop" class="btn btn-outline btn-full">Clear</a>
+        </form>
+      </aside>
+      <div class="shop-content">
+        <div class="shop-toolbar">
+          <span class="shop-count"><%= dresses.length %> dress<%= dresses.length !== 1 ? 'es' : '' %> found</span>
+          <select class="sort-select" onchange="window.location.href=this.value">
+            <option value="?<%= querystring %>1&sort=newest" <%= sort === 'newest' ? 'selected' : '' %>>Newest</option>
+            <option value="?<%= querystring %>1&sort=price-low" <%= sort === 'price-low' ? 'selected' : '' %>>Price: Low to High</option>
+            <option value="?<%= querystring %>1&sort=price-high" <%= sort === 'price-high' ? 'selected' : '' %>>Price: High to Low</option>
+            <option value="?<%= querystring %>1&sort=name" <%= sort === 'name' ? 'selected' : '' %>>Name: A-Z</option>
+          </select>
+        </div>
+        <% if (dresses.length === 0) { %>
+          <div class="empty-state">
+            <i class="fas fa-box-open"></i>
+            <h3>No dresses found</h3>
+            <p>Try adjusting your filters or check back later.</p>
+          </div>
+        <% } else { %>
+          <div class="dress-grid">
+            <% dresses.forEach(dress => { %>
+              <div class="dress-card-wrap">
+                <a href="/dress/<%= dress.id %>" class="dress-card">
+                  <div class="dress-image">
+                    <% if (dress.image) { %>
+                      <img src="<%= dress.image %>" alt="<%= dress.name %>">
+                    <% } else { %>
+                      <div class="no-image"><i class="fas fa-image"></i></div>
+                    <% } %>
+                  </div>
+                  <div class="dress-info">
+                    <h3><%= dress.name %></h3>
+                    <p class="dress-category"><%= dress.category %></p>
+                    <p class="dress-price">₹<%= Number(dress.price).toLocaleString() %></p>
+                    <% if (dress.stock > 0) { %>
+                      <span class="in-stock">In Stock</span>
+                    <% } else { %>
+                      <span class="out-of-stock">Out of Stock</span>
+                    <% } %>
+                  </div>
+                </a>
+                <button class="wishlist-btn <%= wishlistIds.includes(dress.id) ? 'wishlisted' : '' %>" data-id="<%= dress.id %>">
+                  <i class="fa<%= wishlistIds.includes(dress.id) ? 's' : 'r' %> fa-heart"></i>
+                </button>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+        <%- include('../partials/pagination', { page, totalPages, querystring: 'page=' }) %>
+      </div>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>

@@ -1,0 +1,52 @@
+<%- include('header') %>
+<div class="admin-container">
+  <%- include('sidebar') %>
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1>Customers</h1>
+      <form method="GET" action="/admin/customers" style="display:flex;gap:8px;">
+        <input type="text" name="search" value="<%= search %>" placeholder="Search by name or email..." style="padding:10px 16px;background:rgba(10,10,20,0.8);border:1px solid rgba(0,255,247,0.15);border-radius:4px;color:#fff;width:260px;">
+        <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-search"></i></button>
+        <% if (search) { %><a href="/admin/customers" class="btn btn-sm btn-outline">Clear</a><% } %>
+      </form>
+    </div>
+    <% if (customers.length === 0) { %>
+      <div class="empty-state">
+        <i class="fas fa-users"></i>
+        <h3>No customers found</h3>
+        <% if (search) { %><p>No results for "<%= search %>"</p><% } %>
+      </div>
+    <% } else { %>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Orders</th>
+            <th>Total Spent</th>
+            <th>Last Order</th>
+            <th>Joined</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% customers.forEach(c => { %>
+            <tr>
+              <td><strong><%= c.name %></strong></td>
+              <td><%= c.email %></td>
+              <td><%= c.phone || '-' %></td>
+              <td><%= c.order_count %></td>
+              <td>₹<%= Number(c.total_spent).toLocaleString() %></td>
+              <td class="text-muted"><%= c.last_order ? new Date(c.last_order).toLocaleDateString() : 'Never' %></td>
+              <td class="text-muted"><%= new Date(c.created_at).toLocaleDateString() %></td>
+              <td><a href="/admin/customers/<%= c.id %>" class="btn btn-sm btn-outline"><i class="fas fa-eye"></i> View</a></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+      <%- include('../partials/pagination', { page, totalPages, querystring: 'page=' }) %>
+    <% } %>
+  </main>
+</div>
+<%- include('footer') %>

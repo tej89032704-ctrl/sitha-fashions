@@ -1,0 +1,25 @@
+<%- include('../partials/header-noauth') %>
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h1>Sitha Fashions</h1>
+      <p>Customer Login</p>
+    </div>
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-error"><%= error %></div>
+    <% } %>
+    <form action="/login" method="POST">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" required placeholder="Enter your email">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" required placeholder="Enter your password">
+      </div>
+      <button type="submit" class="btn btn-primary btn-full login-btn">Login <span class="icon-1"></span><span class="icon-2"></span><span class="icon-3"></span></button>
+    </form>
+    <p class="auth-footer">Don't have an account? <a href="/register">Register</a></p>
+  </div>
+</div>
+<%- include('../partials/footer') %>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sitha Fashions</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Nunito:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="/js/main.js" defer></script>
+  <script>if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark')</script>
+</head>
+<body>
+<nav class="navbar">
+  <div class="container nav-container">
+    <a href="/" class="logo">Sitha Fashions</a>
+    <button class="hamburger" onclick="document.getElementById('mobile-menu').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/shop">Shop</a>
+      <a href="/wishlist"><i class="fas fa-heart"></i></a>
+      <a href="/orders">My Orders</a>
+      <a href="/cart" class="cart-link">
+        <i class="fas fa-shopping-cart"></i>
+        <% if (typeof cartCount !== 'undefined' && cartCount > 0) { %>
+          <span class="cart-badge"><%= cartCount %></span>
+        <% } %>
+      </a>
+    </div>
+    <div class="nav-right">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode"><i class="fas fa-moon"></i></button>
+      <span class="welcome">Hi, <%= (user ? user.name.split(' ')[0] : 'Guest') %></span>
+      <div class="nav-dropdown">
+        <a href="/profile"><i class="fas fa-user"></i></a>
+        <div class="dropdown-menu">
+          <a href="/profile">Profile</a>
+          <a href="/addresses">Addresses</a>
+          <a href="/wishlist">Wishlist</a>
+          <a href="/returns">Returns</a>
+          <a href="/orders">Orders</a>
+          <a href="/about">About</a>
+          <a href="/contact">Contact</a>
+        </div>
+      </div>
+      <a href="/logout"><i class="fas fa-sign-out-alt"></i></a>
+    </div>
+  </div>
+  <div id="mobile-menu" class="mobile-menu">
+    <a href="/">Home</a>
+    <a href="/shop">Shop</a>
+    <a href="/wishlist">Wishlist</a>
+    <a href="/orders">My Orders</a>
+    <a href="/cart">Cart</a>
+    <a href="/profile">Profile</a>
+    <a href="/addresses">Addresses</a>
+    <a href="/returns">Returns</a>
+    <a href="/about">About</a>
+    <a href="/contact">Contact</a>
+    <a href="#" onclick="toggleTheme();document.getElementById('mobile-menu').classList.remove('open');return false">Toggle Theme</a>
+    <a href="/logout">Logout</a>
+  </div>
+</nav>
+<div class="scroll-progress" id="scrollProgress"></div>
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top"><i class="fas fa-arrow-up"></i></button>
+<div id="toast-container" class="toast-container"></div>
+<div id="loader" class="loader-overlay">
+  <div class="loader-content">
+    <div class="loader-icons">
+      <i class="fas fa-tshirt"></i>
+      <i class="fas fa-vest"></i>
+      <i class="fas fa-gem"></i>
+      <i class="fas fa-crown"></i>
+      <i class="fas fa-vest-patches"></i>
+    </div>
+    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+  </div>
+</div>

@@ -1,0 +1,184 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container">
+    <a href="/shop" class="btn btn-outline">&larr; Back to Shop</a>
+    <div class="dress-detail">
+      <div class="dress-detail-image">
+        <div class="gallery-main">
+          <% if (dress.image) { %>
+            <img src="<%= dress.image %>" alt="<%= dress.name %>" id="gallery-main-img" class="gallery-zoomable">
+          <% } else { %>
+            <div class="no-image large"><i class="fas fa-image"></i></div>
+          <% } %>
+        </div>
+        <div class="gallery-thumbs">
+          <% if (dress.image) { %>
+            <img src="<%= dress.image %>" alt="" class="gallery-thumb active" onclick="selectGallery(this, '<%= dress.image %>')">
+          <% } %>
+          <% gallery.forEach(img => { %>
+            <img src="<%= img.image %>" alt="" class="gallery-thumb" onclick="selectGallery(this, '<%= img.image %>')">
+          <% }) %>
+        </div>
+        <div id="lightbox" class="lightbox" onclick="this.style.display='none'">
+          <span class="lightbox-close">&times;</span>
+          <img id="lightbox-img" src="">
+        </div>
+      </div>
+      <div class="dress-detail-info">
+        <h1><%= dress.name %></h1>
+        <p class="dress-category"><%= dress.category %></p>
+        <p class="dress-price large">₹<%= Number(dress.price).toLocaleString() %></p>
+        <% if (avgRating > 0) { %>
+          <div class="dress-rating">
+            <% for (let i = 1; i <= 5; i++) { %>
+              <i class="fa<%= i <= Math.round(avgRating) ? 's' : 'r' %> fa-star"></i>
+            <% } %>
+            <span>(<%= reviews.length %> reviews)</span>
+          </div>
+        <% } %>
+        <p class="dress-description"><%= dress.description || 'No description available.' %></p>
+        <div class="dress-meta">
+          <% if (dress.color) { %><p><strong>Color:</strong> <%= dress.color %></p><% } %>
+          <% if (dress.size) { %><p><strong>Sizes:</strong> <%= dress.size %></p><% } %>
+          <p><strong>Stock:</strong> 
+            <% if (dress.stock > 0) { %>
+              <span class="in-stock"><%= dress.stock %> available</span>
+            <% } else { %>
+              <span class="out-of-stock">Out of Stock</span>
+            <% } %>
+          </p>
+        </div>
+        <div class="detail-actions">
+          <button class="wishlist-btn wishlist-btn-lg <%= wishlistIds.includes(dress.id) ? 'wishlisted' : '' %>" data-id="<%= dress.id %>">
+            <i class="fa<%= wishlistIds.includes(dress.id) ? 's' : 'r' %> fa-heart"></i>
+            <span><%= wishlistIds.includes(dress.id) ? 'Wishlisted' : 'Add to Wishlist' %></span>
+          </button>
+        </div>
+        <% if (dress.stock > 0) { %>
+          <form action="/cart/add" method="POST" class="add-to-cart-form">
+            <input type="hidden" name="dress_id" value="<%= dress.id %>">
+            <div class="form-row">
+              <% if (dress.size) { %>
+                <div class="form-group">
+                  <label>Size</label>
+                  <select name="size">
+                    <% dress.size.split(',').forEach(s => { %>
+                      <option value="<%= s.trim() %>"><%= s.trim() %></option>
+                    <% }) %>
+                  </select>
+                </div>
+              <% } %>
+              <div class="form-group">
+                <label>Quantity</label>
+                <input type="number" name="quantity" value="1" min="1" max="<%= dress.stock %>">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full add-cart-btn">Add to Cart <span></span><span></span><span></span><span></span><span></span><span></span></button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</section>
+
+<% if (related.length > 0) { %>
+<section class="section">
+  <div class="container">
+    <div class="section-header"><h2>Related Products</h2><a href="/shop?category=<%= encodeURIComponent(dress.category) %>" class="btn btn-outline">View All</a></div>
+    <div class="dress-grid">
+      <% related.forEach(r => { %>
+        <div class="dress-card-wrap">
+          <a href="/dress/<%= r.id %>" class="dress-card">
+            <div class="dress-image">
+              <% if (r.image) { %><img src="<%= r.image %>" alt="<%= r.name %>"><% } else { %><div class="no-image"><i class="fas fa-image"></i></div><% } %>
+            </div>
+            <div class="dress-info">
+              <h3><%= r.name %></h3>
+              <p class="dress-category"><%= r.category %></p>
+              <p class="dress-price">₹<%= Number(r.price).toLocaleString() %></p>
+            </div>
+          </a>
+          <button class="wishlist-btn <%= wishlistIds.includes(r.id) ? 'wishlisted' : '' %>" data-id="<%= r.id %>">
+            <i class="fa<%= wishlistIds.includes(r.id) ? 's' : 'r' %> fa-heart"></i>
+          </button>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header"><h2>Reviews</h2><button class="btn btn-outline" onclick="document.getElementById('size-guide').style.display='flex'">Size Guide</button></div>
+    <% if (reviews.length === 0) { %>
+      <p class="text-muted">No reviews yet.</p>
+    <% } else { %>
+      <div class="reviews-list">
+        <% reviews.forEach(r => { %>
+          <div class="review-card">
+            <div class="review-header">
+              <strong><%= r.user_name %></strong>
+              <div class="review-stars">
+                <% for (let i = 1; i <= 5; i++) { %>
+                  <i class="fa<%= i <= r.rating ? 's' : 'r' %> fa-star"></i>
+                <% } %>
+              </div>
+            </div>
+            <% if (r.comment) { %><p><%= r.comment %></p><% } %>
+            <small><%= new Date(r.created_at).toLocaleDateString() %></small>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+    <% if (canReview) { %>
+      <form action="/review/add" method="POST" class="review-form">
+        <h3>Write a Review</h3>
+        <input type="hidden" name="dress_id" value="<%= dress.id %>">
+        <div class="form-group">
+          <label>Rating</label>
+          <div class="star-rating">
+            <% for (let i = 5; i >= 1; i--) { %>
+              <input type="radio" name="rating" value="<%= i %>" id="star<%= i %>" <%= i === 5 ? 'checked' : '' %>>
+              <label for="star<%= i %>"><i class="fas fa-star"></i></label>
+            <% } %>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Comment (optional)</label>
+          <textarea name="comment" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Review</button>
+      </form>
+    <% } %>
+  </div>
+</section>
+<div id="size-guide" class="modal-overlay" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-content">
+    <span class="modal-close" onclick="document.getElementById('size-guide').style.display='none'">&times;</span>
+    <h2>Size Guide</h2>
+    <table class="size-chart">
+      <tr><th>Size</th><th>Bust (inches)</th><th>Waist (inches)</th><th>Hips (inches)</th><th>Length (inches)</th></tr>
+      <tr><td>XS</td><td>30-32</td><td>24-26</td><td>33-35</td><td>36</td></tr>
+      <tr><td>S</td><td>32-34</td><td>26-28</td><td>35-37</td><td>37</td></tr>
+      <tr><td>M</td><td>34-36</td><td>28-30</td><td>37-39</td><td>38</td></tr>
+      <tr><td>L</td><td>36-38</td><td>30-32</td><td>39-41</td><td>39</td></tr>
+      <tr><td>XL</td><td>38-40</td><td>32-34</td><td>41-43</td><td>40</td></tr>
+      <tr><td>XXL</td><td>40-42</td><td>34-36</td><td>43-45</td><td>41</td></tr>
+    </table>
+    <p class="text-muted" style="margin-top:12px;font-style:italic">Measurements are approximate. Sizes may vary by style.</p>
+  </div>
+</div>
+
+<script>
+function selectGallery(el, src) {
+  document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('gallery-main-img').src = src;
+}
+document.getElementById('gallery-main-img')?.addEventListener('click', function() {
+  document.getElementById('lightbox').style.display = 'flex';
+  document.getElementById('lightbox-img').src = this.src;
+});
+</script>
+<%- include('../partials/footer') %>

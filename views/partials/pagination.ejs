@@ -1,0 +1,9 @@
+<% if (totalPages > 1) { %>
+<div class="pagination">
+  <% if (page > 1) { %><a href="?<%= querystring %><%= page - 1 %>" class="page-link">&laquo; Prev</a><% } %>
+  <% for (let p = Math.max(1, page - 2); p <= Math.min(totalPages, page + 2); p++) { %>
+    <a href="?<%= querystring %><%= p %>" class="page-link <%= p === page ? 'active' : '' %>"><%= p %></a>
+  <% } %>
+  <% if (page < totalPages) { %><a href="?<%= querystring %><%= page + 1 %>" class="page-link">Next &raquo;</a><% } %>
+</div>
+<% } %>

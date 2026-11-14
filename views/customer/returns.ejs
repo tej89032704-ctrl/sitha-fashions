@@ -1,0 +1,27 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container">
+    <div class="section-header"><h2>My Returns</h2></div>
+    <% if (typeof error !== 'undefined' && error) { %><div class="alert alert-error"><%= error %></div><% } %>
+    <% if (typeof success !== 'undefined' && success) { %><div class="alert alert-success"><%= success %></div><% } %>
+    <% if (returns.length === 0) { %>
+      <div class="empty-state"><i class="fas fa-undo"></i><h3>No returns yet</h3><p>Return requests can be made from delivered orders.</p><a href="/orders" class="btn btn-primary">View Orders</a></div>
+    <% } else { %>
+      <% returns.forEach(r => { %>
+        <div class="order-card">
+          <div class="order-header">
+            <div><strong>Return #<%= r.id %></strong><span class="order-date">Order #<%= r.order_id %></span></div>
+            <span class="order-status status-<%= r.status %>"><%= r.status.charAt(0).toUpperCase() + r.status.slice(1) %></span>
+          </div>
+          <div class="order-items">
+            <div class="order-item">
+              <div class="order-item-info"><p><%= r.dress_name %></p><small>Qty: <%= r.quantity %> | Reason: <%= r.reason %></small></div>
+            </div>
+          </div>
+          <% if (r.notes) { %><div class="order-footer"><span>Admin notes: <%= r.notes %></span></div><% } %>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
+</section>
+<%- include('../partials/footer') %>

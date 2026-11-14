@@ -1,0 +1,17 @@
+<%- include('../partials/header') %>
+<script>document.addEventListener('DOMContentLoaded',function(){setTimeout(fireConfetti,500)})</script>
+<section class="section">
+  <div class="container">
+    <div class="success-page reveal visible">
+      <i class="fas fa-check-circle success-icon"></i>
+      <h1>Payment Successful!</h1>
+      <p>Your order #<%= order.id %> has been placed successfully.</p>
+      <p>Total paid: <strong>₹<%= Number(order.total_amount - order.discount_amount).toLocaleString() %></strong></p>
+      <div class="success-actions">
+        <a href="/orders" class="btn btn-primary">View Orders</a>
+        <a href="/shop" class="btn btn-outline">Continue Shopping</a>
+      </div>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>

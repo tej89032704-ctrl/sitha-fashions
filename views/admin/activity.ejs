@@ -1,0 +1,36 @@
+<%- include('header') %>
+<div class="admin-container">
+  <%- include('sidebar') %>
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1>Activity Log</h1>
+      <span class="text-muted" style="font-size:0.85rem;"><%= logs.length %> entries (last 200)</span>
+    </div>
+
+    <table class="admin-table">
+      <thead><tr><th>Time</th><th>Admin</th><th>Action</th><th>Entity</th><th>Details</th></tr></thead>
+      <tbody>
+        <% logs.forEach(l => { %>
+          <tr>
+            <td class="text-muted" style="white-space:nowrap;"><%= new Date(l.created_at).toLocaleString() %></td>
+            <td><%= l.admin_name || 'System' %></td>
+            <td>
+              <span class="badge" style="
+                <% if (l.action === 'create') { %>background:rgba(0,255,65,0.1);color:var(--neon-green);
+                <% } else if (l.action === 'delete') { %>background:rgba(255,0,64,0.1);color:var(--neon-red);
+                <% } else if (l.action === 'update') { %>background:rgba(0,136,255,0.1);color:var(--neon-blue);
+                <% } else { %>background:rgba(255,255,0,0.1);color:var(--neon-yellow);<% } %>
+              "><%= l.action %></span>
+            </td>
+            <td><%= l.entity_type %> <%= l.entity_id ? '#' + l.entity_id : '' %></td>
+            <td style="color:var(--text-dim);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= l.details || '-' %></td>
+          </tr>
+        <% }) %>
+        <% if (logs.length === 0) { %>
+          <tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:40px;">No activity logged yet</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </main>
+</div>
+<%- include('footer') %>

@@ -1,0 +1,63 @@
+<%- include('header') %>
+<div class="admin-container">
+  <%- include('sidebar') %>
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1>Products</h1>
+      <a href="/admin/dresses/add" class="btn btn-primary"><i class="fas fa-plus"></i> Add Product</a>
+    </div>
+    <% if (dresses.length === 0) { %>
+      <div class="empty-state">
+        <i class="fas fa-tshirt"></i>
+        <h3>No products yet</h3>
+        <p>Start by adding your first product.</p>
+      </div>
+    <% } else { %>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Status</th>
+            <th>Active</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% dresses.forEach(dress => { %>
+            <tr>
+              <td>
+                <% if (dress.image) { %>
+                  <img src="<%= dress.image %>" alt="<%= dress.name %>" class="table-img">
+                <% } else { %>
+                  <div class="no-image tiny"><i class="fas fa-image"></i></div>
+                <% } %>
+              </td>
+              <td><strong><%= dress.name %></strong></td>
+              <td><%= dress.category || '-' %></td>
+              <td>₹<%= Number(dress.price).toLocaleString() %></td>
+              <td style="color:<%= dress.stock <= dress.low_stock_threshold ? 'var(--neon-red)' : 'var(--neon-green)' %>;"><%= dress.stock %></td>
+              <td>
+                <% if (dress.stock === 0) { %><span class="badge badge-danger">Out</span>
+                <% } else if (dress.stock <= dress.low_stock_threshold) { %><span class="badge" style="background:rgba(255,102,0,0.1);color:var(--neon-orange);">Low</span>
+                <% } else { %><span class="badge badge-success">OK</span><% } %>
+              </td>
+              <td><span style="color:<%= dress.is_active ? 'var(--neon-green)' : 'var(--neon-red)' %>;"><%= dress.is_active ? 'ON' : 'OFF' %></span></td>
+              <td class="action-td">
+                <a href="/admin/dresses/edit/<%= dress.id %>" class="btn btn-sm btn-outline"><i class="fas fa-edit"></i></a>
+                <form action="/admin/dresses/delete/<%= dress.id %>" method="POST" onsubmit="return confirm('Delete this product?')" style="display:inline;">
+                  <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+      <%- include('../partials/pagination', { page, totalPages, querystring: 'page=' }) %>
+    <% } %>
+  </main>
+</div>
+<%- include('footer') %>

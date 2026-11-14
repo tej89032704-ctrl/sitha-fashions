@@ -1,0 +1,75 @@
+<%- include('header') %>
+<div class="admin-container">
+  <%- include('sidebar') %>
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1>Inventory</h1>
+      <div class="filter-tabs">
+        <a href="/admin/inventory?filter=all" class="btn btn-sm <%= filter === 'all' ? 'btn-primary' : 'btn-outline' %>">All</a>
+        <a href="/admin/inventory?filter=active" class="btn btn-sm <%= filter === 'active' ? 'btn-primary' : 'btn-outline' %>">Active</a>
+        <a href="/admin/inventory?filter=low" class="btn btn-sm <%= filter === 'low' ? 'btn-primary' : 'btn-outline' %>">Low Stock (<%= lowCount %>)</a>
+        <a href="/admin/inventory?filter=out" class="btn btn-sm <%= filter === 'out' ? 'btn-primary' : 'btn-outline' %>">Out of Stock (<%= outCount %>)</a>
+      </div>
+    </div>
+
+    <div class="stats-grid" style="margin-bottom:28px;grid-template-columns:repeat(3,1fr);">
+      <div class="stat-card" style="border-left-color:var(--neon-green);">
+        <i class="fas fa-check-circle" style="color:var(--neon-green);"></i>
+        <div><h3><%= inStock %></h3><p>In Stock</p></div>
+      </div>
+      <div class="stat-card" style="border-left-color:var(--neon-orange);">
+        <i class="fas fa-exclamation-triangle" style="color:var(--neon-orange);"></i>
+        <div><h3><%= lowCount %></h3><p>Low Stock</p></div>
+      </div>
+      <div class="stat-card" style="border-left-color:var(--neon-red);">
+        <i class="fas fa-times-circle" style="color:var(--neon-red);"></i>
+        <div><h3><%= outCount %></h3><p>Out of Stock</p></div>
+      </div>
+    </div>
+
+    <form method="POST" action="/admin/inventory/bulk" style="margin-bottom:20px;display:flex;gap:10px;align-items:center;">
+      <span style="font-size:0.8rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;">Bulk Actions:</span>
+      <button type="submit" name="action" value="activate_all" class="btn btn-sm btn-success">Activate All</button>
+      <button type="submit" name="action" value="deactivate_zero" class="btn btn-sm btn-outline">Deactivate Zero Stock</button>
+    </form>
+
+    <table class="admin-table">
+      <thead>
+        <tr><th>Product</th><th>Image</th><th>Category</th><th>Stock</th><th>Threshold</th><th>Status</th><th>Update Stock</th><th>Active</th></tr>
+      </thead>
+      <tbody>
+        <% dresses.forEach(d => { %>
+          <tr>
+            <td><strong><%= d.name %></strong></td>
+            <td>
+              <% if (d.image) { %>
+                <img src="<%= d.image %>" class="table-img">
+              <% } else { %>
+                <div class="no-image tiny"><i class="fas fa-image"></i></div>
+              <% } %>
+            </td>
+            <td class="text-muted"><%= d.category || '-' %></td>
+            <td style="font-weight:700;color:<%= d.stock <= d.low_stock_threshold ? 'var(--neon-red)' : 'var(--neon-green)' %>;"><%= d.stock %></td>
+            <td><%= d.low_stock_threshold %></td>
+            <td>
+              <% if (d.stock === 0) { %><span class="badge badge-danger">Out</span>
+              <% } else if (d.stock <= d.low_stock_threshold) { %><span class="badge" style="background:rgba(255,102,0,0.1);color:var(--neon-orange);">Low</span>
+              <% } else { %><span class="badge badge-success">OK</span><% } %>
+            </td>
+            <td>
+              <form method="POST" action="/admin/inventory/update" class="status-form" style="display:flex;gap:6px;">
+                <input type="hidden" name="dress_id" value="<%= d.id %>">
+                <input type="number" name="stock" value="<%= d.stock %>" min="0" style="width:70px;padding:6px 8px;background:rgba(10,10,20,0.8);border:1px solid rgba(0,255,247,0.15);border-radius:4px;color:#fff;">
+                <button type="submit" class="btn btn-sm btn-primary">Set</button>
+              </form>
+            </td>
+            <td>
+              <span style="color:<%= d.is_active ? 'var(--neon-green)' : 'var(--neon-red)' %>;"><%= d.is_active ? 'ON' : 'OFF' %></span>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </main>
+</div>
+<%- include('footer') %>

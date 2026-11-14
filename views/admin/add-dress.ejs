@@ -1,0 +1,62 @@
+<%- include('header') %>
+<div class="admin-container">
+  <%- include('sidebar') %>
+  <main class="admin-main">
+    <h1>Add Product</h1>
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <%= error %></div>
+    <% } %>
+    <div class="form-card">
+      <form action="/admin/dresses/add" method="POST" enctype="multipart/form-data">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Product Name *</label>
+            <input type="text" name="name" required value="<%= dress.name || '' %>" placeholder="Product name">
+          </div>
+          <div class="form-group">
+            <label>Price (₹) *</label>
+            <input type="number" name="price" required step="0.01" min="0" value="<%= dress.price || '' %>" placeholder="0.00">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea name="description" rows="3" placeholder="Product description"><%= dress.description || '' %></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category</label>
+            <input type="text" name="category" placeholder="e.g. Western, Ethnic, Party" value="<%= dress.category || '' %>">
+          </div>
+          <div class="form-group">
+            <label>Color</label>
+            <input type="text" name="color" placeholder="e.g. Red, Blue" value="<%= dress.color || '' %>">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Sizes (comma separated)</label>
+            <input type="text" name="size" placeholder="e.g. S, M, L, XL" value="<%= dress.size || '' %>">
+          </div>
+          <div class="form-group">
+            <label>Initial Stock</label>
+            <input type="number" name="stock" min="0" value="<%= dress.stock || '0' %>">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Low Stock Threshold</label>
+            <input type="number" name="low_stock_threshold" min="1" value="<%= dress.low_stock_threshold || '5' %>">
+            <small style="color:var(--text-muted);font-size:0.75rem;">Alert when stock drops below this</small>
+          </div>
+          <div class="form-group">
+            <label>Image</label>
+            <input type="file" name="image" accept="image/*">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Add Product</button>
+        <a href="/admin/dresses" class="btn btn-outline">Cancel</a>
+      </form>
+    </div>
+  </main>
+</div>
+<%- include('footer') %>

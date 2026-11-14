@@ -1,0 +1,202 @@
+<%- include('header') %>
+<div class="admin-container">
+  <%- include('sidebar') %>
+  <main class="admin-main">
+    <h1>Dashboard</h1>
+
+    <div class="stats-grid">
+      <div class="stat-card reveal" style="transition-delay:0s">
+        <i class="fas fa-rupee-sign"></i>
+        <div>
+          <h3 class="counter" data-target="<%= revenue %>">0</h3>
+          <p>Total Revenue</p>
+        </div>
+      </div>
+      <div class="stat-card reveal" style="transition-delay:0.1s">
+        <i class="fas fa-shopping-bag"></i>
+        <div>
+          <h3 class="counter" data-target="<%= orderCount %>">0</h3>
+          <p>Total Orders</p>
+        </div>
+      </div>
+      <div class="stat-card reveal" style="transition-delay:0.2s">
+        <i class="fas fa-tshirt"></i>
+        <div>
+          <h3 class="counter" data-target="<%= dressCount %>">0</h3>
+          <p>Products</p>
+        </div>
+      </div>
+      <div class="stat-card reveal" style="transition-delay:0.3s">
+        <i class="fas fa-users"></i>
+        <div>
+          <h3 class="counter" data-target="<%= customerCount %>">0</h3>
+          <p>Customers</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 36px;">
+      <div class="stat-card reveal" style="border-left: 3px solid #ff6600;transition-delay:0.1s">
+        <i class="fas fa-clock" style="color: #ff6600;"></i>
+        <div>
+          <h3 class="counter" data-target="<%= pendingOrders %>">0</h3>
+          <p>Pending Orders</p>
+        </div>
+      </div>
+      <div class="stat-card reveal" style="border-left: 3px solid #ff0040;transition-delay:0.2s">
+        <i class="fas fa-exclamation-triangle" style="color: #ff0040;"></i>
+        <div>
+          <h3 class="counter" data-target="<%= lowStockCount %>">0</h3>
+          <p>Low Stock Items</p>
+        </div>
+      </div>
+      <div class="stat-card reveal" style="border-left: 3px solid #00ff41;transition-delay:0.3s">
+        <i class="fas fa-chart-line" style="color: #00ff41;"></i>
+        <div>
+          <h3 class="counter" data-target="<%= customerCount %>">0</h3>
+          <p>Active Customers</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-grid reveal" style="margin-bottom: 28px;">
+      <div class="admin-card">
+        <h2>Revenue (Last 30 Days)</h2>
+        <canvas id="revenueChart" height="200"></canvas>
+      </div>
+      <div class="admin-card">
+        <h2>Orders by Status</h2>
+        <canvas id="statusChart" height="200"></canvas>
+      </div>
+    </div>
+
+    <div class="admin-grid reveal" style="margin-bottom: 28px;">
+      <div class="admin-card">
+        <h2>Top Selling Products</h2>
+        <table class="admin-table" style="box-shadow:none;border:none;background:transparent;">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Price</th>
+              <th>Sold</th>
+              <th>Revenue</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (topProducts.length === 0) { %>
+              <tr><td colspan="4" style="text-align:center;color:var(--text-dim);">No sales yet</td></tr>
+            <% } %>
+            <% topProducts.forEach(p => { %>
+              <tr>
+                <td><%= p.name %></td>
+                <td>₹<%= Number(p.price).toLocaleString() %></td>
+                <td><%= p.total_sold %></td>
+                <td>₹<%= Number(p.price * p.total_sold).toLocaleString() %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+      <div class="admin-card">
+        <h2>Low Stock Alerts</h2>
+        <table class="admin-table" style="box-shadow:none;border:none;background:transparent;">
+          <thead>
+            <tr><th>Product</th><th>Stock</th><th>Threshold</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+            <% if (lowStock.length === 0) { %>
+              <tr><td colspan="4" style="text-align:center;color:var(--text-dim);">All stocked up</td></tr>
+            <% } %>
+            <% lowStock.forEach(d => { %>
+              <tr>
+                <td><%= d.name %></td>
+                <td style="color:var(--neon-red);font-weight:700;"><%= d.stock %></td>
+                <td><%= d.low_stock_threshold %></td>
+                <td><a href="/admin/inventory" class="btn btn-sm btn-primary">Restock</a></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <h2>Recent Orders</h2>
+      <table class="admin-table" style="box-shadow:none;border:none;background:transparent;">
+        <thead>
+          <tr><th>Order#</th><th>Customer</th><th>Amount</th><th>Status</th><th>Payment</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          <% recentOrders.forEach(o => { %>
+            <tr>
+              <td>#<%= o.id %></td>
+              <td><%= o.customer_name %></td>
+              <td>₹<%= Number(o.total_amount).toLocaleString() %></td>
+              <td><span class="order-status status-<%= o.status %>"><%= o.status %></span></td>
+              <td><span style="color:<%= o.payment_status === 'paid' ? 'var(--neon-green)' : 'var(--neon-orange)' %>;"><%= o.payment_status %></span></td>
+              <td class="text-muted"><%= new Date(o.created_at).toLocaleDateString() %></td>
+            </tr>
+          <% }) %>
+          <% if (recentOrders.length === 0) { %>
+            <tr><td colspan="6" style="text-align:center;color:var(--text-dim);">No orders yet</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const revCtx = document.getElementById('revenueChart').getContext('2d');
+const revDays = <%= JSON.stringify(revenueByDay.map(d => d.day)) %>;
+const revData = <%= JSON.stringify(revenueByDay.map(d => d.revenue)) %>;
+new Chart(revCtx, {
+  type: 'line',
+  data: {
+    labels: revDays,
+    datasets: [{
+      label: 'Revenue (₹)',
+      data: revData,
+      borderColor: '#00fff7',
+      backgroundColor: 'rgba(0,255,247,0.1)',
+      fill: true,
+      tension: 0.4,
+      pointRadius: 3,
+      pointBackgroundColor: '#00fff7',
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { color: '#686880', maxTicksLimit: 10 }, grid: { color: 'rgba(0,255,247,0.05)' } },
+      y: { ticks: { color: '#686880' }, grid: { color: 'rgba(0,255,247,0.05)' } }
+    }
+  }
+});
+
+const stCtx = document.getElementById('statusChart').getContext('2d');
+const stLabels = <%= JSON.stringify(ordersByStatus.map(s => s.status)) %>;
+const stData = <%= JSON.stringify(ordersByStatus.map(s => s.count)) %>;
+const colors = { pending: '#ff6600', confirmed: '#0088ff', shipped: '#00fff7', delivered: '#00ff41', cancelled: '#ff0040' };
+new Chart(stCtx, {
+  type: 'doughnut',
+  data: {
+    labels: stLabels,
+    datasets: [{
+      data: stData,
+      backgroundColor: stLabels.map(l => colors[l] || '#686880'),
+      borderColor: '#0a0a0f',
+      borderWidth: 2,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { labels: { color: '#d0d0e0' } }
+    }
+  }
+});
+</script>
+<%- include('footer') %>

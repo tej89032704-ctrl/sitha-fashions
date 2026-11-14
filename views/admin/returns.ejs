@@ -1,0 +1,42 @@
+<%- include('header') %>
+<div class="admin-container">
+  <%- include('sidebar') %>
+  <main class="admin-main">
+    <h1>Return Requests</h1>
+    <table class="admin-table">
+      <thead>
+        <tr><th>ID</th><th>Customer</th><th>Dress</th><th>Order</th><th>Qty</th><th>Reason</th><th>Status</th><th>Date</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        <% returns.forEach(r => { %>
+          <tr>
+            <td>#<%= r.id %></td>
+            <td><%= r.user_name %></td>
+            <td><%= r.dress_name %></td>
+            <td>#<%= r.order_id %></td>
+            <td><%= r.quantity %></td>
+            <td><%= r.reason %></td>
+            <td><span class="order-status status-<%= r.status %>"><%= r.status %></span></td>
+            <td><%= new Date(r.created_at).toLocaleDateString() %></td>
+            <td>
+              <form action="/admin/returns/update/<%= r.id %>" method="POST" class="status-form" style="display:flex;gap:6px">
+                <select name="status">
+                  <option value="pending" <%= r.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                  <option value="approved" <%= r.status === 'approved' ? 'selected' : '' %>>Approved</option>
+                  <option value="rejected" <%= r.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
+                  <option value="refunded" <%= r.status === 'refunded' ? 'selected' : '' %>>Refunded</option>
+                </select>
+                <input type="text" name="notes" placeholder="Notes" value="<%= r.notes %>" style="width:140px;padding:6px 10px;border:1px solid var(--border-vintage);border-radius:4px;font-family:var(--font-body)">
+                <button type="submit" class="btn btn-sm btn-primary">Update</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+        <% if (returns.length === 0) { %>
+          <tr><td colspan="9" class="text-muted" style="text-align:center;padding:40px">No return requests</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </main>
+</div>
+<%- include('footer') %>

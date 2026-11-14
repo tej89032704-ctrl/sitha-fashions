@@ -1,0 +1,32 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container">
+    <div class="section-header"><h2>Contact Us</h2></div>
+    <% if (typeof error !== 'undefined' && error) { %><div class="alert alert-error"><%= error %></div><% } %>
+    <% if (typeof success !== 'undefined' && success) { %><div class="alert alert-success"><%= success %></div><% } %>
+    <div class="contact-layout">
+      <div class="contact-form">
+        <h3>Send us a message</h3>
+        <form action="/contact" method="POST">
+          <div class="form-group">
+            <label>Subject</label>
+            <input type="text" name="subject" required placeholder="Order inquiry, return request, etc.">
+          </div>
+          <div class="form-group">
+            <label>Message</label>
+            <textarea name="message" required rows="5" placeholder="How can we help you?"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">Send Message</button>
+        </form>
+      </div>
+      <div class="contact-info">
+        <h3>Get in Touch</h3>
+        <div class="contact-detail"><i class="fas fa-envelope"></i><div><strong>Email</strong><p>support@sithafashions.com</p></div></div>
+        <div class="contact-detail"><i class="fas fa-phone"></i><div><strong>Phone</strong><p>+91 98765 43210</p></div></div>
+        <div class="contact-detail"><i class="fas fa-map-marker-alt"></i><div><strong>Address</strong><p>123 Fashion Street, Boutique Lane, Mumbai - 400001</p></div></div>
+        <div class="contact-detail"><i class="fas fa-clock"></i><div><strong>Hours</strong><p>Mon-Sat: 10:00 AM - 8:00 PM</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>

@@ -1,0 +1,120 @@
+<%- include('../partials/header') %>
+<% if (coupons.length > 0) { %>
+<div class="coupon-ticker">
+  <div class="coupon-ticker-track">
+    <div class="coupon-ticker-content">
+      <span class="ticker-label">🎉 Offers</span>
+      <% coupons.forEach(function(c) { %>
+        <span class="ticker-coupon" onclick="copyCoupon('<%= c.code %>')">
+          <strong><%= c.code %></strong>
+          <% if (c.discount_type === 'percentage') { %><%= c.discount_value %>% OFF<% } else { %>₹<%= c.discount_value %> OFF<% } %>
+          <% if (c.min_order_amount > 0) { %><span class="ticker-divider">|</span><span class="ticker-min">Min ₹<%= Number(c.min_order_amount).toLocaleString() %></span><% } %>
+        </span>
+      <% }) %>
+    </div>
+    <div class="coupon-ticker-content" aria-hidden="true">
+      <span class="ticker-label">🎉 Offers</span>
+      <% coupons.forEach(function(c) { %>
+        <span class="ticker-coupon" onclick="copyCoupon('<%= c.code %>')">
+          <strong><%= c.code %></strong>
+          <% if (c.discount_type === 'percentage') { %><%= c.discount_value %>% OFF<% } else { %>₹<%= c.discount_value %> OFF<% } %>
+          <% if (c.min_order_amount > 0) { %><span class="ticker-divider">|</span><span class="ticker-min">Min ₹<%= Number(c.min_order_amount).toLocaleString() %></span><% } %>
+        </span>
+      <% }) %>
+    </div>
+  </div>
+</div>
+<% } %>
+<section class="hero reveal">
+  <div class="container">
+    <h1>Welcome to <span>Sitha Fashions</span></h1>
+    <p>Discover the latest trends in fashion. Shop our exclusive collection of dresses.</p>
+    <a href="/shop" class="btn btn-primary">Shop Now</a>
+  </div>
+</section>
+
+<section class="section reveal">
+  <div class="container">
+    <div class="section-header">
+      <h2>Categories</h2>
+    </div>
+    <div class="category-grid">
+      <% categories.forEach(function(cat, i) { %>
+        <a href="/shop?category=<%= encodeURIComponent(cat) %>" class="category-card reveal" style="transition-delay:<%= i*0.08 %>s">
+          <i class="fas fa-tshirt"></i>
+          <span><%= cat %></span>
+        </a>
+      <% }) %>
+      <a href="/shop" class="category-card">
+        <i class="fas fa-th-large"></i>
+        <span>All</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2>New Arrivals</h2>
+      <a href="/shop" class="btn btn-outline">View All</a>
+    </div>
+    <div class="dress-grid">
+      <% dresses.slice(0, 8).forEach(function(dress, i) { %>
+        <div class="dress-card-wrap reveal" style="transition-delay:<%= i*0.06 %>s">
+          <a href="/dress/<%= dress.id %>" class="dress-card">
+            <div class="dress-image">
+              <% if (dress.image) { %>
+                <img src="<%= dress.image %>" alt="<%= dress.name %>">
+              <% } else { %>
+                <div class="no-image"><i class="fas fa-image"></i></div>
+              <% } %>
+            </div>
+            <div class="dress-info">
+              <h3><%= dress.name %></h3>
+              <p class="dress-category"><%= dress.category %></p>
+              <p class="dress-price">₹<%= Number(dress.price).toLocaleString() %></p>
+            </div>
+          </a>
+          <button class="wishlist-btn <%= wishlistIds.includes(dress.id) ? 'wishlisted' : '' %>" data-id="<%= dress.id %>">
+            <i class="fa<%= wishlistIds.includes(dress.id) ? 's' : 'r' %> fa-heart"></i>
+          </button>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<% if (typeof recentDresses !== 'undefined' && recentDresses.length > 0) { %>
+<section class="section reveal">
+  <div class="container">
+    <div class="section-header">
+      <h2>Recently Viewed</h2>
+      <a href="/shop" class="btn btn-outline">View All</a>
+    </div>
+    <div class="dress-grid">
+      <% recentDresses.forEach(function(dress, i) { %>
+        <div class="dress-card-wrap reveal" style="transition-delay:<%= i*0.06 %>s">
+          <a href="/dress/<%= dress.id %>" class="dress-card">
+            <div class="dress-image">
+              <% if (dress.image) { %>
+                <img src="<%= dress.image %>" alt="<%= dress.name %>">
+              <% } else { %>
+                <div class="no-image"><i class="fas fa-image"></i></div>
+              <% } %>
+            </div>
+            <div class="dress-info">
+              <h3><%= dress.name %></h3>
+              <p class="dress-category"><%= dress.category %></p>
+              <p class="dress-price">₹<%= Number(dress.price).toLocaleString() %></p>
+            </div>
+          </a>
+          <button class="wishlist-btn <%= wishlistIds.includes(dress.id) ? 'wishlisted' : '' %>" data-id="<%= dress.id %>">
+            <i class="fa<%= wishlistIds.includes(dress.id) ? 's' : 'r' %> fa-heart"></i>
+          </button>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<% } %>
+<%- include('../partials/footer') %>

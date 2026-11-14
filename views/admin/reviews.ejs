@@ -1,0 +1,49 @@
+<%- include('header') %>
+<div class="admin-container">
+  <%- include('sidebar') %>
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1>Reviews</h1>
+      <div class="filter-tabs">
+        <a href="/admin/reviews?filter=all" class="btn btn-sm <%= filter === 'all' ? 'btn-primary' : 'btn-outline' %>">All</a>
+        <a href="/admin/reviews?filter=pending" class="btn btn-sm <%= filter === 'pending' ? 'btn-primary' : 'btn-outline' %>">Pending (<%= pendingCount %>)</a>
+      </div>
+    </div>
+
+    <table class="admin-table">
+      <thead><tr><th>Product</th><th>Customer</th><th>Rating</th><th>Comment</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        <% reviews.forEach(r => { %>
+          <tr>
+            <td><%= r.dress_name %></td>
+            <td><%= r.user_name %></td>
+            <td>
+              <% for (let i = 1; i <= 5; i++) { %>
+                <i class="fas fa-star" style="color:<%= i <= r.rating ? 'var(--neon-yellow)' : 'var(--text-muted)' %>;font-size:0.8rem;"></i>
+              <% } %>
+            </td>
+            <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= r.comment || '-' %></td>
+            <td class="text-muted"><%= new Date(r.created_at).toLocaleDateString() %></td>
+            <td>
+              <span class="badge <%= r.is_approved ? 'badge-success' : 'badge-danger' %>"><%= r.is_approved ? 'Approved' : 'Pending' %></span>
+            </td>
+            <td class="action-td">
+              <% if (!r.is_approved) { %>
+                <form method="POST" action="/admin/reviews/approve/<%= r.id %>" style="display:inline;">
+                  <button type="submit" class="btn btn-sm btn-success"><i class="fas fa-check"></i></button>
+                </form>
+              <% } %>
+              <form method="POST" action="/admin/reviews/delete/<%= r.id %>" style="display:inline;" onsubmit="return confirm('Delete this review?')">
+                <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+        <% if (reviews.length === 0) { %>
+          <tr><td colspan="7" style="text-align:center;color:var(--text-dim);padding:40px;">No reviews yet</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </main>
+</div>
+<%- include('footer') %>

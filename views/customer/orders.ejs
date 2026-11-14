@@ -1,0 +1,68 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2>My Orders</h2>
+    </div>
+    <div class="shop-toolbar" style="margin-top:0">
+      <span class="shop-count"><%= orders.length %> order<%= orders.length !== 1 ? 's' : '' %></span>
+      <select class="sort-select" onchange="window.location.href='/orders?sort='+this.value">
+        <option value="newest" <%= sort === 'newest' ? 'selected' : '' %>>Newest First</option>
+        <option value="oldest" <%= sort === 'oldest' ? 'selected' : '' %>>Oldest First</option>
+      </select>
+    </div>
+    <% if (orders.length === 0) { %>
+      <div class="empty-state">
+        <i class="fas fa-box"></i>
+        <h3>No orders yet</h3>
+        <p>Start shopping to place your first order.</p>
+        <a href="/shop" class="btn btn-primary">Shop Now</a>
+      </div>
+    <% } else { %>
+      <% orders.forEach(order => { %>
+        <a href="/orders/<%= order.id %>" class="order-card-link">
+          <div class="order-card">
+            <div class="order-header">
+              <div>
+                <strong>Order #<%= order.id %></strong>
+                <span class="order-date"><%= new Date(order.created_at).toLocaleDateString() %></span>
+              </div>
+              <span class="order-status status-<%= order.status %>"><%= order.status.charAt(0).toUpperCase() + order.status.slice(1) %></span>
+            </div>
+            <div class="order-items">
+              <% (orderItems[order.id] || []).slice(0, 3).forEach(item => { %>
+                <div class="order-item">
+                  <% if (item.image) { %>
+                    <img src="<%= item.image %>" alt="<%= item.name %>">
+                  <% } else { %>
+                    <div class="no-image tiny"><i class="fas fa-image"></i></div>
+                  <% } %>
+                  <div class="order-item-info">
+                    <p><%= item.name %></p>
+                    <small>Qty: <%= item.quantity %> | Size: <%= item.size || '-' %></small>
+                  </div>
+                  <span>₹<%= (item.price * item.quantity).toLocaleString() %></span>
+                </div>
+              <% }) %>
+              <% if ((orderItems[order.id] || []).length > 3) { %>
+                <div class="order-item"><small>+<%= (orderItems[order.id] || []).length - 3 %> more items</small></div>
+              <% } %>
+            </div>
+            <div class="order-footer">
+              <div>
+                <span>Total: <strong>₹<%= Number(order.total_amount).toLocaleString() %></strong></span>
+                <% if (order.discount_amount > 0) { %>
+                  <span class="order-discount">Discount: -₹<%= Number(order.discount_amount).toLocaleString() %> <% if (order.coupon_code) { %>(<%= order.coupon_code %>)<% } %></span>
+                  <span class="order-net">Net: ₹<%= Number(order.total_amount - order.discount_amount).toLocaleString() %></span>
+                <% } %>
+                <span>Payment: <span class="status-<%= order.payment_status %>"><%= order.payment_status.charAt(0).toUpperCase() + order.payment_status.slice(1) %></span></span>
+              </div>
+              <span>Delivery: <%= order.address %></span>
+            </div>
+          </div>
+        </a>
+      <% }) %>
+    <% } %>
+  </div>
+</section>
+<%- include('../partials/footer') %>

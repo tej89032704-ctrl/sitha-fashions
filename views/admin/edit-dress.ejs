@@ -1,0 +1,73 @@
+<%- include('header') %>
+<div class="admin-container">
+  <%- include('sidebar') %>
+  <main class="admin-main">
+    <h1>Edit Product</h1>
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <%= error %></div>
+    <% } %>
+    <div class="form-card">
+      <form action="/admin/dresses/edit/<%= dress.id %>" method="POST" enctype="multipart/form-data">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Product Name *</label>
+            <input type="text" name="name" required value="<%= dress.name %>">
+          </div>
+          <div class="form-group">
+            <label>Price (₹) *</label>
+            <input type="number" name="price" required step="0.01" min="0" value="<%= dress.price %>">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea name="description" rows="3"><%= dress.description %></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category</label>
+            <input type="text" name="category" value="<%= dress.category %>">
+          </div>
+          <div class="form-group">
+            <label>Color</label>
+            <input type="text" name="color" value="<%= dress.color %>">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Sizes (comma separated)</label>
+            <input type="text" name="size" value="<%= dress.size %>">
+          </div>
+          <div class="form-group">
+            <label>Stock</label>
+            <input type="number" name="stock" min="0" value="<%= dress.stock %>">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Low Stock Threshold</label>
+            <input type="number" name="low_stock_threshold" min="1" value="<%= dress.low_stock_threshold || '5' %>">
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" name="is_active" <%= dress.is_active ? 'checked' : '' %> style="width:auto;margin-right:8px;">
+              Active (visible in shop)
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Image</label>
+          <% if (dress.image) { %>
+            <div class="current-image">
+              <img src="<%= dress.image %>" alt="Current" class="table-img">
+              <span>Current image (upload new to replace)</span>
+            </div>
+          <% } %>
+          <input type="file" name="image" accept="image/*">
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update Product</button>
+        <a href="/admin/dresses" class="btn btn-outline">Cancel</a>
+      </form>
+    </div>
+  </main>
+</div>
+<%- include('footer') %>
